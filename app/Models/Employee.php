@@ -8,7 +8,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 class Employee extends Authenticatable
 {
-    use HasUuids, HasApiTokens;
+    use HasApiTokens, HasUuids;
 
     protected $hidden = [
         'password',

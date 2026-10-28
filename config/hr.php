@@ -20,4 +20,3 @@ return [
     'refresh_token_ttl_days' => (int) env('REFRESH_TOKEN_TTL_DAYS', 30),
 
 ];
-
