@@ -20,6 +20,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Model::shouldBeStrict(! $this->app->isProduction());
+        // Enable strict mode for Eloquent models in non-production environments to enforce stricter data handling and validation.
+        Model::shouldBeStrict(! $this->app->environment('production'));
     }
 }
