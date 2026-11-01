@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Meeting extends BaseModel
 {
     protected $fillable = [
-        'created_by_id',
         'title',
         'description',
         'starts_at',
