@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\HasApiTokens;
@@ -83,6 +84,10 @@ class Employee extends Authenticatable
         return $this->belongsToMany(Meeting::class, 'meeting_participants');
     }
 
+    public function notifications(): HasMany
+{
+    return $this->hasMany(Notification::class);
+}
 
     // ---------- Accessors ----------
 
