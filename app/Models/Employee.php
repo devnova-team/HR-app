@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -14,7 +15,7 @@ use Spatie\Permission\Traits\HasRoles;
 
 class Employee extends Authenticatable
 {
-    use HasApiTokens, HasUuids ,HasRoles;
+    use HasApiTokens, HasUuids ,HasRoles, HasFactory;
 
         protected $fillable = [
         'level_id',
@@ -84,10 +85,26 @@ class Employee extends Authenticatable
         return $this->belongsToMany(Meeting::class, 'meeting_participants');
     }
 
+    //notifications && chat
     public function notifications(): HasMany
-{
-    return $this->hasMany(Notification::class);
-}
+    {
+        return $this->hasMany(Notification::class);
+    }
+
+    public function conversations():BelongsToMany{
+        return $this->belongsToMany(
+            Conversation::class,
+            'conversation_participants',
+            'employee_id',
+            'conversation_id'
+        )->withPivot('last_read_at');
+
+    }
+
+    public function sentMessages(): HasMany
+    {
+        return $this->hasMany(Message::class, 'sender_id');
+    }
 
     // ---------- Accessors ----------
 
