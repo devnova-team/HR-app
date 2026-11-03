@@ -1,3 +1,4 @@
+
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -6,25 +7,24 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('attendance_breaks', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('attendance_record_id')->constrained('attendance_record')->cascadeOnDelete();
-            $table->timestamps('started_at');
-            $table->timestamps('ended_at')->nullable();
-            $table->timestamps('created_at');
+
+            $table->foreignUuid('attendance_record_id')
+                ->constrained('attendance_records')
+                ->cascadeOnDelete();
+
+            $table->timestamp('started_at');
+            $table->timestamp('ended_at')->nullable();
+
+            $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('work_attendance_breaks');
+        Schema::dropIfExists('attendance_breaks');
     }
 };

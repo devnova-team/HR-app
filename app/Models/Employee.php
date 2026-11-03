@@ -98,8 +98,6 @@ class Employee extends Authenticatable
     protected function avatarUrl(): Attribute
     {
         return Attribute::make(
-            get: fn() => $this->avatar_uri ? Storage::disk('public')->url($this->avatar_uri) : null,
-=======
             get: fn () => $this->avatar_url ? Storage::disk('public')->url($this->avatar_url) : null,
         );
     }
@@ -124,10 +122,7 @@ class Employee extends Authenticatable
                 $this->country?->name,
             ])->filter()->implode(', ') ?: null,
         );
-    }}
-
-
-
+    }
 
     public function employeeWorkSchedules()
     {

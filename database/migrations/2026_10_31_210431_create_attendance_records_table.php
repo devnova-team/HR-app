@@ -15,8 +15,8 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->foreignUuid('employee_id')->constrained('employees')->cascadeOnDelete();
             $table->foreignUuid('work_schedule_id')->nullable()->constrained('work_schedules')->nullOnDelete();
-            $table->unique(['employee_id', 'work_date']);
             $table->date('work_date');
+            $table->unique(['employee_id', 'work_date']);
             $table->timestamp('clock_in_time');
             $table->timestamp('clock_out_time')->nullable();
             $table->string('selfie_url');
@@ -35,6 +35,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('work_attendance_records');
+        Schema::dropIfExists('attendance_records');
     }
 };
