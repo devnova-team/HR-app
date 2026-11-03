@@ -13,9 +13,9 @@ use Spatie\Permission\Traits\HasRoles;
 
 class Employee extends Authenticatable
 {
-    use HasApiTokens, HasUuids ,HasRoles;
+    use HasApiTokens, HasRoles ,HasUuids;
 
-        protected $fillable = [
+    protected $fillable = [
         'level_id',
         'department_id',
         'job_title_id',
@@ -42,11 +42,11 @@ class Employee extends Authenticatable
 
     protected $casts = [
         'password' => 'hashed',
-        'date_of_birth'=> 'date',
-        'is_verified'=> 'boolean',
+        'date_of_birth' => 'date',
+        'is_verified' => 'boolean',
     ];
 
-    //------------- Relationships ----------
+    // ------------- Relationships ----------
 
     public function level(): BelongsTo
     {
@@ -83,19 +83,28 @@ class Employee extends Authenticatable
         return $this->belongsToMany(Meeting::class, 'meeting_participants');
     }
 
+    public function passwordResetOtps()
+    {
+        return $this->hasMany(PasswordResetOtp::class);
+    }
+
+    public function refreshTokens()
+    {
+        return $this->hasMany(RefreshToken::class);
+    }
 
     // ---------- Accessors ----------
 
-    //full name accessor: combines first and last name into one string
-    protected function fullName() : Attribute
+    // full name accessor: combines first and last name into one string
+    protected function fullName(): Attribute
     {
         return Attribute::make(
             get: fn () => trim("{$this->first_name} {$this->last_name}"),
         );
     }
 
-    //avatar_link accessor: returns the full URL to the avatar image if it exists, otherwise null
-    protected function avatarUrl() : Attribute
+    // avatar_link accessor: returns the full URL to the avatar image if it exists, otherwise null
+    protected function avatarUrl(): Attribute
     {
         return Attribute::make(
             get: fn () => $this->avatar_url ? Storage::disk('public')->url($this->avatar_url) : null,
@@ -111,7 +120,8 @@ class Employee extends Authenticatable
     }
 
     // address accessor: one formatted line from the structured address
-    protected function address(): Attribute{
+    protected function address(): Attribute
+    {
 
         return Attribute::make(
             get: fn () => collect([
@@ -119,9 +129,7 @@ class Employee extends Authenticatable
                 $this->city?->name,
                 $this->governorate?->name,
                 $this->country?->name,
-            ])->filter()->implode(', ')?: null,
+            ])->filter()->implode(', ') ?: null,
         );
-    }}
-
-
-
+    }
+}
