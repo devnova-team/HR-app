@@ -10,6 +10,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Employee extends Authenticatable
 {
@@ -91,6 +92,21 @@ class Employee extends Authenticatable
     public function refreshTokens()
     {
         return $this->hasMany(RefreshToken::class);
+    }
+
+    public function assignedTasks(): HasMany
+    {
+        return $this->hasMany(Task::class, 'assigned_by_id');
+    }
+
+    public function tasks(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Task::class,
+            'task_assignees',
+            'employee_id',
+            'task_id'
+        );
     }
 
     // ---------- Accessors ----------

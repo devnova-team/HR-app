@@ -6,14 +6,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class TaskAttachment extends BaseModel
 {
-    public $timestamps = false;
-
+    public const UPDATED_AT = null;
+    
     protected $fillable = [
         'task_id',
         'file_url',
         'file_name',
         'mime_type',
-        'created_at',
     ];
 
     protected function casts(): array

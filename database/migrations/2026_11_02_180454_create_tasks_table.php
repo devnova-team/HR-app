@@ -24,12 +24,12 @@ return new class extends Migration
             $table->string('title');
             $table->text('description');
 
-            $table->string('status');
+            $table->string('status')->default('toDo');
             $table->string('priority');
             $table->string('difficulty');
 
-            $table->integer('progress');
-            $table->integer('story_points');
+            $table->integer('progress')->default(0);
+            $table->integer('story_points')->nullable();
 
             $table->timestamp('due_date');
             $table->timestamp('completed_at')->nullable();

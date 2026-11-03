@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use App\Enums\TaskDifficulty;
+use App\Enums\TaskPriority;
+use App\Enums\TaskStatus;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -27,6 +30,9 @@ class Task extends BaseModel
     protected function casts(): array
     {
         return [
+            'status' => TaskStatus::class,
+            'priority' => TaskPriority::class,
+            'difficulty' => TaskDifficulty::class,
             'progress' => 'integer',
             'story_points' => 'integer',
             'due_date' => 'datetime',
