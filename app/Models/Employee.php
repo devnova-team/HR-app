@@ -47,7 +47,7 @@ class Employee extends Authenticatable
         'is_verified' => 'boolean',
     ];
 
-    //------------- Relationships ----------
+    // ------------- Relationships ----------
 
     public function level(): BelongsTo
     {
@@ -98,6 +98,35 @@ class Employee extends Authenticatable
     // ---------- Accessors ----------
 
     //full name accessor: combines first and last name into one string
+
+    public function passwordResetOtps()
+    {
+        return $this->hasMany(PasswordResetOtp::class);
+    }
+
+    public function refreshTokens()
+    {
+        return $this->hasMany(RefreshToken::class);
+    }
+
+    public function assignedTasks(): HasMany
+    {
+        return $this->hasMany(Task::class, 'assigned_by_id');
+    }
+
+    public function tasks(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Task::class,
+            'task_assignees',
+            'employee_id',
+            'task_id'
+        );
+    }
+
+    // ---------- Accessors ----------
+
+    // full name accessor: combines first and last name into one string
     protected function fullName(): Attribute
     {
         return Attribute::make(
@@ -106,6 +135,7 @@ class Employee extends Authenticatable
     }
 
     //avatar_link accessor: returns the full URL to the avatar image if it exists, otherwise null
+
     protected function avatarUrl(): Attribute
     {
         return Attribute::make(
