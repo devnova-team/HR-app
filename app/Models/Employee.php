@@ -18,26 +18,26 @@ class Employee extends Authenticatable
 
     protected $casts = [
         'password' => 'hashed',
-        'date_of_birth'=> 'date',
-        'is_verified'=> 'boolean',
+        'date_of_birth' => 'date',
+        'is_verified' => 'boolean',
     ];
 
 
     // ---------- Accessors ----------
 
     //full name accessor: combines first and last name into one string
-    protected function fullName() : Attribute
+    protected function fullName(): Attribute
     {
         return Attribute::make(
-            get: fn () => trim("{$this->first_name} {$this->last_name}"),
+            get: fn() => trim("{$this->first_name} {$this->last_name}"),
         );
     }
 
     //avatar_link accessor: returns the full URL to the avatar image if it exists, otherwise null
-    protected function avatarUrl() : Attribute
+    protected function avatarUrl(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->avatar_uri ? Storage::disk('public')->url($this->avatar_uri) : null,
+            get: fn() => $this->avatar_uri ? Storage::disk('public')->url($this->avatar_uri) : null,
         );
     }
 
@@ -45,21 +45,32 @@ class Employee extends Authenticatable
     protected function positionLabel(): Attribute
     {
         return Attribute::make(
-            get: fn () => trim("{$this->level?->name} {$this->jobTitle?->name}") ?: null,
+            get: fn() => trim("{$this->level?->name} {$this->jobTitle?->name}") ?: null,
         );
     }
 
     // address accessor: one formatted line from the structured address
-    protected function address(): Attribute{
+    protected function address(): Attribute
+    {
 
         return Attribute::make(
-            get: fn () => collect([
+            get: fn() => collect([
                 $this->full_address,
                 $this->city?->name,
                 $this->governorate?->name,
                 $this->country?->name,
-            ])->filter()->implode(', ')?: null,
+            ])->filter()->implode(', ') ?: null,
         );
     }
 
+
+    public function employeeWorkSchedules()
+    {
+        return $this->hasMany(EmployeeWorkSchedule::class, 'employee_id');
+    }
+
+    public function attendanceRecords()
+    {
+        return $this->hasMany(AttendanceRecord::class, 'employee_id');
+    }
 }
