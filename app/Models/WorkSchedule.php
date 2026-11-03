@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Models\BaseModel;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class WorkSchedule extends Model
+class WorkSchedule extends BaseModel
 {
+
+
     protected $fillable = [
-        'id',
+
         'name',
         'clock_in_time',
         'clock_out_time',
@@ -16,17 +19,19 @@ class WorkSchedule extends Model
 
     ];
 
-    protected $casts = ['grace_period_minutes',
-        'is_default',];
+    protected $casts = [
+        'grace_period_minutes' => 'integer',
+        'is_default' => 'boolean',
+    ];
 
 
-    public function employee_work_schedules()
+    public function employeeWorkSchedules(): HasMany
     {
-        return $this->hasMany(EmployeeWorkSchedule::class , 'work_schedule_id');
+        return $this->hasMany(EmployeeWorkSchedule::class, 'work_schedule_id');
     }
 
-    public function attendance_records()
+    public function attendanceRecords(): HasMany
     {
-        return $this->hasMany(AttendanceRecord::class , 'work_schedule_id');
+        return $this->hasMany(AttendanceRecord::class, 'work_schedule_id');
     }
 }

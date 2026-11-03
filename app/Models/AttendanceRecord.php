@@ -2,16 +2,19 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Models\BaseModel;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Enums\AttendanceStatus;
 
-class AttendanceRecord extends Model
+class AttendanceRecord extends BaseModel
 {
     protected $fillable = [
         'employee_id',
         'work_schedule_id',
         'work_date',
-        'clock_in_time',
-        'clock_out_time',
+        'clock_in_at',
+        'clock_out_at',
         'selfie_url',
         'clock_in_latitude',
         'clock_in_longitude',
@@ -23,25 +26,26 @@ class AttendanceRecord extends Model
 
     protected $casts = [
         'work_date'           => 'date',
-        'clock_in_time'       => 'datetime',
-        'clock_out_time'      => 'datetime',
+        'clock_in_at'       => 'datetime',
+        'clock_out_at'      => 'datetime',
         'clock_in_latitude'   => 'float',
         'clock_in_longitude'  => 'float',
         'clock_out_latitude'  => 'float',
         'clock_out_longitude' => 'float',
+        'status' => AttendanceStatus::class,
     ];
 
-    public function employee()
+    public function employee(): BelongsTo
     {
         return $this->belongsTo(Employee::class, 'employee_id');
     }
 
-    public function workSchedule()
+    public function workSchedule(): BelongsTo
     {
         return $this->belongsTo(WorkSchedule::class, 'work_schedule_id');
     }
 
-    public function breaks()
+    public function breaks(): HasMany
     {
         return $this->hasMany(AttendanceBreak::class, 'attendance_record_id');
     }

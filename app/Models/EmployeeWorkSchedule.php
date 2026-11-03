@@ -2,20 +2,21 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Models\BaseModel;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class EmployeeWorkSchedule extends Model
+
+class EmployeeWorkSchedule extends BaseModel
 {
 
-  
+
 
     protected $fillable = [
         'employee_id',
         'work_schedule_id',
         'effective_from',
         'effective_to',
-        'created_at',
-        'updated_at'
+
     ];
 
     protected $casts = [
@@ -23,12 +24,12 @@ class EmployeeWorkSchedule extends Model
         'effective_to'   => 'date',
     ];
 
-    public function employees()
+    public function employee(): BelongsTo
     {
         return $this->belongsTo(Employee::class, 'employee_id');
     }
 
-    public function work_schedules()
+    public function workSchedule(): BelongsTo
     {
         return $this->belongsTo(WorkSchedule::class, 'work_schedule_id');
     }

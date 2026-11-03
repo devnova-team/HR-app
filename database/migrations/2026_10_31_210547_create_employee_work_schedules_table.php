@@ -12,10 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('employee_work_schedules', function (Blueprint $table) {
-            $table->foreignUuid('employee_id')->primary()->constrained('employees')->cascadeOnDelete();
+            $table->uuid('id')->primary();
+            $table->foreignUuid('employee_id')->constrained('employees')->cascadeOnDelete();
             $table->foreignUuid('work_schedule_id')->constrained('work_schedules');
-            $table->date('effective_from');
+            $table->date('effective_from')->nullable();
             $table->date('effective_to')->nullable();
+            $table->unique(['effective_from' , 'effective_to']);
             $table->timestamps();
         });
     }

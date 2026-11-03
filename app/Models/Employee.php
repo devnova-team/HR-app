@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\HasApiTokens;
@@ -13,9 +14,9 @@ use Spatie\Permission\Traits\HasRoles;
 
 class Employee extends Authenticatable
 {
-    use HasApiTokens, HasUuids ,HasRoles;
+    use HasApiTokens, HasUuids, HasRoles;
 
-        protected $fillable = [
+    protected $fillable = [
         'level_id',
         'department_id',
         'job_title_id',
@@ -83,6 +84,16 @@ class Employee extends Authenticatable
         return $this->belongsToMany(Meeting::class, 'meeting_participants');
     }
 
+    public function employeeWorkSchedules(): HasMany
+    {
+        return $this->hasMany(EmployeeWorkSchedule::class, 'employee_id');
+    }
+
+    public function attendanceRecords():HasMany
+    {
+        return $this->hasMany(AttendanceRecord::class, 'employee_id');
+    }
+
 
     // ---------- Accessors ----------
 
@@ -98,7 +109,7 @@ class Employee extends Authenticatable
     protected function avatarUrl(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->avatar_url ? Storage::disk('public')->url($this->avatar_url) : null,
+            get: fn() => $this->avatar_url ? Storage::disk('public')->url($this->avatar_url) : null,
         );
     }
 
@@ -122,15 +133,5 @@ class Employee extends Authenticatable
                 $this->country?->name,
             ])->filter()->implode(', ') ?: null,
         );
-    }
-
-    public function employeeWorkSchedules()
-    {
-        return $this->hasMany(EmployeeWorkSchedule::class, 'employee_id');
-    }
-
-    public function attendanceRecords()
-    {
-        return $this->hasMany(AttendanceRecord::class, 'employee_id');
     }
 }

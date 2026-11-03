@@ -2,25 +2,22 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Models\BaseModel;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class AttendanceBreak extends Model
+class AttendanceBreak extends BaseModel
 {
     protected $fillable = [
-        'attendance_id',
         'attendance_record_id',
         'started_at',
         'ended_at',
-        'created_at',
-        'updated_at'
     ];
-
     protected $casts = [
         'started_at' => 'datetime',
         'ended_at'   => 'datetime',
     ];
 
-    public function attendanceRecord()
+    public function attendanceRecord(): BelongsTo
     {
         return $this->belongsTo(AttendanceRecord::class, 'attendance_record_id');
     }
