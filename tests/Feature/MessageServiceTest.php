@@ -194,6 +194,76 @@ public function test_same_employee_pair_gets_one_conversation(): void
     $this->assertDatabaseCount('conversations', 1);
     $this->assertDatabaseCount('conversation_participants', 2);
 }
+public function test_sending_message_creates_notification_for_recipient_only(): void
+{
+    $sender = Employee::factory()->create();
+    $receiver = Employee::factory()->create();
 
+    $conversation = Conversation::create([
+        'pair_key' => collect([$sender->id, $receiver->id])
+            ->sort()
+            ->implode(':'),
+    ]);
 
+    $conversation->participants()->attach([
+        $sender->id,
+        $receiver->id,
+    ]);
+
+    app(MessageService::class)->sendMessage(
+        $conversation->id,
+        $sender->id,
+        [
+            'type' => 'text',
+            'body' => 'Hello',
+        ]
+    );
+
+    $this->assertDatabaseHas('notifications', [
+        'employee_id' => $receiver->id,
+        'title' => 'New message',
+        'body' => 'Hello',
+        'type' => 'chat',
+        'reference_id' => $conversation->id,
+    ]);
+
+    $this->assertDatabaseMissing('notifications', [
+        'employee_id' => $sender->id,
+        'type' => 'chat',
+        'reference_id' => $conversation->id,
+    ]);
+}
+public function test_sending_image_message_creates_notification_for_recipient(): void
+{
+    $sender = Employee::factory()->create();
+    $receiver = Employee::factory()->create();
+
+    $conversation = Conversation::create([
+        'pair_key' => collect([$sender->id, $receiver->id])
+            ->sort()
+            ->implode(':'),
+    ]);
+
+    $conversation->participants()->attach([
+        $sender->id,
+        $receiver->id,
+    ]);
+
+    app(MessageService::class)->sendMessage(
+        $conversation->id,
+        $sender->id,
+        [
+            'type' => 'image',
+            'media_url' => 'https://example.com/image.jpg',
+        ]
+    );
+
+    $this->assertDatabaseHas('notifications', [
+        'employee_id' => $receiver->id,
+        'title' => 'New message',
+        'body' => 'Sent an image',
+        'type' => 'chat',
+        'reference_id' => $conversation->id,
+    ]);
+}
 }

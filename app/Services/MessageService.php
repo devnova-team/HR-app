@@ -6,11 +6,12 @@ use App\Models\Conversation;
 use App\Models\Message;
 use App\Repositories\MessageRepositoryInterface;
 use Illuminate\Auth\Access\AuthorizationException;
-
+use Illuminate\Support\Facades\DB;
 class MessageService
 {
     public function __construct(
-        protected MessageRepositoryInterface $repo
+        protected MessageRepositoryInterface $repo,
+        protected NotificationService $notificationService
     ) {}
 
     public function sendMessage(string $conversationId,string $senderId,array $data): Message {
@@ -44,15 +45,38 @@ class MessageService
                 'You are not a participant in this conversation.'
             );
         }
+        // Get the other participant
+            $recipient = $conversation->participants()
+            ->where('employees.id', '!=', $senderId)
+            ->first();
 
-        // 4. Create message
-        $message= $this->repo->create([
-            ...$data,
-            'conversation_id' => $conversationId,
-            'sender_id' => $senderId,
-            'created_at' => now(),
-        ]);
-        $conversation->touch();
-        return $message;
+            if (!$recipient) {
+            throw new \RuntimeException('Conversation recipient not found.');
+            }
+
+       // 4. Create message and notification in one transaction
+    return DB::transaction(function () use ($data, $conversationId, $senderId, $conversation, $recipient) {
+            $message = $this->repo->create([
+                ...$data,
+                'conversation_id' => $conversationId,
+                'sender_id' => $senderId,
+                'created_at' => now(),
+            ]);
+            $conversation->touch();
+            $notificationBody = match ($data['type']) {
+                'text' => $data['body'],
+                'image' => 'Sent an image',
+                'voice' => 'Sent a voice message',
+                'document' => 'Sent a document',
+            };
+            $this->notificationService->send(
+                $recipient,
+                'New message',
+                $notificationBody,
+                'chat',
+                $conversationId
+            );
+            return $message;
+        });
     }
 }

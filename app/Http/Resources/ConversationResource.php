@@ -36,7 +36,8 @@ class ConversationResource extends JsonResource
                     ];
                 }
             ),
-
+            'unread_count' => $this->unread_count ?? 0,
+            
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
