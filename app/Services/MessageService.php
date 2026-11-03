@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\Conversation;
 use App\Models\Message;
-use App\Repositories\MessageRepositoryInterface;
+use App\Repositories\Interfaces\MessageRepositoryInterface;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\DB;
 class MessageService

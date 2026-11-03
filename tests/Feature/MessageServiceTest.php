@@ -4,7 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Conversation;
 use App\Models\Employee;
-use App\Repositories\MessageRepositoryInterface;
+use App\Repositories\Interfaces\MessageRepositoryInterface;
 use App\Services\ConversationService;
 use App\Services\MessageService;
 use Illuminate\Auth\Access\AuthorizationException;

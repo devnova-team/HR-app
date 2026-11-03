@@ -1,10 +1,12 @@
 <?php
 
 use App\Http\Controllers\Api\ConversationController;
+use App\Http\Controllers\Api\EmployeePushTokenController;
 use App\Http\Controllers\Api\MessageController;
 use App\Http\Controllers\Api\NotificationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
 
 Route::middleware('auth:sanctum')->group(function () {
 
@@ -16,7 +18,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/notifications', [NotificationController::class, 'index']);
     Route::patch('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
     Route::patch('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
-
+    Route::post('/devices/push-token', [EmployeePushTokenController::class, 'store']);
     // Conversations
     Route::get('/conversations', [ConversationController::class, 'index']);
     Route::post('/conversations', [ConversationController::class, 'store']);

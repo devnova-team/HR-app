@@ -3,7 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Conversation;
-use App\Repositories\ConversationRepositoryInterface;
+use App\Repositories\Interfaces\ConversationRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class ConversationRepository implements ConversationRepositoryInterface{

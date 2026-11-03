@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Message;
+use App\Repositories\Interfaces\MessageRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class MessageRepository implements MessageRepositoryInterface

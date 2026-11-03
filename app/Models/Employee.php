@@ -106,6 +106,10 @@ class Employee extends Authenticatable
         return $this->hasMany(Message::class, 'sender_id');
     }
 
+    public function pushTokens(): HasMany
+    {
+        return $this->hasMany(EmployeePushToken::class);
+    }
     // ---------- Accessors ----------
 
     //full name accessor: combines first and last name into one string

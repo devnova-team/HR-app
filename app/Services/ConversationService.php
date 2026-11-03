@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Repositories\ConversationRepositoryInterface;
+use App\Repositories\Interfaces\ConversationRepositoryInterface;
 use Illuminate\Support\Facades\DB;
 class ConversationService
 {
