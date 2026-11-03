@@ -4,13 +4,37 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 
 class Employee extends Authenticatable
 {
-    use HasApiTokens, HasUuids;
+    use HasApiTokens, HasUuids ,HasRoles;
+
+        protected $fillable = [
+        'level_id',
+        'department_id',
+        'job_title_id',
+        'employee_id',
+        'first_name',
+        'last_name',
+        'email',
+        'phone_number',
+        'password',
+        'date_of_birth',
+        'avatar_url',
+        'full_address',
+        'country_id',
+        'governorate_id',
+        'city_id',
+        'is_verified',
+        'is_first_login',
+        'is_active',
+    ];
 
     protected $hidden = [
         'password',
@@ -21,6 +45,43 @@ class Employee extends Authenticatable
         'date_of_birth' => 'date',
         'is_verified' => 'boolean',
     ];
+
+    //------------- Relationships ----------
+
+    public function level(): BelongsTo
+    {
+        return $this->belongsTo(Level::class);
+    }
+
+    public function department(): BelongsTo
+    {
+        return $this->belongsTo(Department::class);
+    }
+
+    public function jobTitle(): BelongsTo
+    {
+        return $this->belongsTo(JobTitle::class);
+    }
+
+    public function country(): BelongsTo
+    {
+        return $this->belongsTo(Country::class);
+    }
+
+    public function governorate(): BelongsTo
+    {
+        return $this->belongsTo(Governorate::class);
+    }
+
+    public function city(): BelongsTo
+    {
+        return $this->belongsTo(City::class);
+    }
+
+    public function meetings(): BelongsToMany
+    {
+        return $this->belongsToMany(Meeting::class, 'meeting_participants');
+    }
 
 
     // ---------- Accessors ----------
@@ -38,6 +99,8 @@ class Employee extends Authenticatable
     {
         return Attribute::make(
             get: fn() => $this->avatar_uri ? Storage::disk('public')->url($this->avatar_uri) : null,
+=======
+            get: fn () => $this->avatar_url ? Storage::disk('public')->url($this->avatar_url) : null,
         );
     }
 
@@ -61,7 +124,9 @@ class Employee extends Authenticatable
                 $this->country?->name,
             ])->filter()->implode(', ') ?: null,
         );
-    }
+    }}
+
+
 
 
     public function employeeWorkSchedules()
