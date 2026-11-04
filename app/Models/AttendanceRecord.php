@@ -2,10 +2,9 @@
 
 namespace App\Models;
 
-use App\Models\BaseModel;
+use App\Enums\ClockStatus;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use App\Enums\AttendanceStatus;
 
 class AttendanceRecord extends BaseModel
 {
@@ -26,13 +25,13 @@ class AttendanceRecord extends BaseModel
 
     protected $casts = [
         'work_date'           => 'date',
-        'clock_in_at'       => 'datetime',
-        'clock_out_at'      => 'datetime',
+        'clock_in_at'         => 'datetime',
+        'clock_out_at'        => 'datetime',
         'clock_in_latitude'   => 'float',
         'clock_in_longitude'  => 'float',
         'clock_out_latitude'  => 'float',
         'clock_out_longitude' => 'float',
-        'status' => AttendanceStatus::class,
+        'status'              => ClockStatus::class,
     ];
 
     public function employee(): BelongsTo

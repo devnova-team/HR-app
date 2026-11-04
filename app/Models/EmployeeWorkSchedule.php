@@ -2,21 +2,15 @@
 
 namespace App\Models;
 
-use App\Models\BaseModel;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-
 
 class EmployeeWorkSchedule extends BaseModel
 {
-
-
-
     protected $fillable = [
         'employee_id',
         'work_schedule_id',
         'effective_from',
         'effective_to',
-
     ];
 
     protected $casts = [

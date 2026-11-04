@@ -21,9 +21,11 @@ return new class extends Migration
             $table->decimal('clock_out_latitude', 10, 7)->nullable();
             $table->decimal('clock_out_longitude', 10, 7)->nullable();
             $table->text('notes')->nullable();
-            $table->string('status')->default('not_started');
+            $table->string('status')->default('clockedIn');
             $table->timestamps();
 
+            // One record per employee per day. This unique constraint is also the
+            // (employee_id, work_date) index, so no second index is needed.
             $table->unique(['employee_id', 'work_date']);
         });
     }

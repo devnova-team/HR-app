@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Models\BaseModel;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class AttendanceBreak extends BaseModel
@@ -12,6 +11,7 @@ class AttendanceBreak extends BaseModel
         'started_at',
         'ended_at',
     ];
+
     protected $casts = [
         'started_at' => 'datetime',
         'ended_at'   => 'datetime',

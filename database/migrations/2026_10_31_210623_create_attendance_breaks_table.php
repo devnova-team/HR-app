@@ -1,4 +1,3 @@
-
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -16,13 +15,13 @@ return new class extends Migration
                 ->constrained('attendance_records')
                 ->cascadeOnDelete();
 
-            $table->index('attendance_record_id');
-
-
             $table->timestamp('started_at');
-            $table->timestamp('ended_at')->nullable();
+            $table->timestamp('ended_at')->nullable(); 
 
             $table->timestamps();
+
+
+            $table->index(['attendance_record_id', 'ended_at']);
         });
     }
 
