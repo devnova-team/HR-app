@@ -15,9 +15,9 @@ use Spatie\Permission\Traits\HasRoles;
 
 class Employee extends Authenticatable
 {
-    use HasApiTokens, HasUuids ,HasRoles, HasFactory;
+    use HasApiTokens, HasUuids, HasRoles, HasFactory;
 
-        protected $fillable = [
+    protected $fillable = [
         'level_id',
         'department_id',
         'job_title_id',
@@ -44,11 +44,13 @@ class Employee extends Authenticatable
 
     protected $casts = [
         'password' => 'hashed',
-        'date_of_birth'=> 'date',
-        'is_verified'=> 'boolean',
+        'date_of_birth' => 'date',
+        'is_verified' => 'boolean',
+        'is_first_login' => 'boolean',
+        'is_active' => 'boolean',
     ];
 
-    //------------- Relationships ----------
+    // ------------- Relationships ----------
 
     public function level(): BelongsTo
     {
@@ -85,69 +87,113 @@ class Employee extends Authenticatable
         return $this->belongsToMany(Meeting::class, 'meeting_participants');
     }
 
-    //notifications && chat
+    // Notifications
     public function notifications(): HasMany
     {
         return $this->hasMany(Notification::class);
     }
 
-    public function conversations():BelongsToMany{
+    // Employee Work Schedules
+    public function employeeWorkSchedules(): HasMany
+    {
+        return $this->hasMany(EmployeeWorkSchedule::class, 'employee_id');
+    }
+
+    // Attendance Records
+    public function attendanceRecords(): HasMany
+    {
+        return $this->hasMany(AttendanceRecord::class, 'employee_id');
+    }
+
+    // Conversations
+    public function conversations(): BelongsToMany
+    {
         return $this->belongsToMany(
             Conversation::class,
             'conversation_participants',
             'employee_id',
             'conversation_id'
         )->withPivot('last_read_at');
-
     }
 
+    // Sent Messages
     public function sentMessages(): HasMany
     {
         return $this->hasMany(Message::class, 'sender_id');
     }
 
+    // Push Tokens
     public function pushTokens(): HasMany
     {
         return $this->hasMany(EmployeePushToken::class);
     }
+
+    // Password Reset OTPs
+    public function passwordResetOtps(): HasMany
+    {
+        return $this->hasMany(PasswordResetOtp::class);
+    }
+
+    // Refresh Tokens
+    public function refreshTokens(): HasMany
+    {
+        return $this->hasMany(RefreshToken::class);
+    }
+
+    // Tasks
+    public function assignedTasks(): HasMany
+    {
+        return $this->hasMany(Task::class, 'assigned_by_id');
+    }
+
+    public function tasks(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Task::class,
+            'task_assignees',
+            'employee_id',
+            'task_id'
+        );
+    }
+
     // ---------- Accessors ----------
 
-    //full name accessor: combines first and last name into one string
-    protected function fullName() : Attribute
+    // Full Name
+    protected function fullName(): Attribute
     {
         return Attribute::make(
-            get: fn () => trim("{$this->first_name} {$this->last_name}"),
+            get: fn() => trim("{$this->first_name} {$this->last_name}"),
         );
     }
 
-    //avatar_link accessor: returns the full URL to the avatar image if it exists, otherwise null
-    protected function avatarUrl() : Attribute
+    // Avatar URL
+    protected function avatarUrl(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->avatar_url ? Storage::disk('public')->url($this->avatar_url) : null,
+            get: fn (?string $value) => $value
+                ? Storage::disk('public')->url($value)
+                : null,
         );
     }
 
-    // position_label accessor: combines level and job title into one string
+    // Position Label
     protected function positionLabel(): Attribute
     {
         return Attribute::make(
-            get: fn () => trim("{$this->level?->name} {$this->jobTitle?->name}") ?: null,
+            get: fn() => trim("{$this->level?->name} {$this->jobTitle?->name}") ?: null,
         );
     }
 
-    // address accessor: one formatted line from the structured address
-    protected function address(): Attribute{
-
+    // Formatted Address
+    protected function address(): Attribute
+    {
         return Attribute::make(
-            get: fn () => collect([
+            get: fn() => collect([
                 $this->full_address,
                 $this->city?->name,
                 $this->governorate?->name,
                 $this->country?->name,
-            ])->filter()->implode(', ')?: null,
+            ])->filter()->implode(', ') ?: null,
         );
-    }}
-
-
-
+    }
+}
