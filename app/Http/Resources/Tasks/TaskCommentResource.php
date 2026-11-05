@@ -24,7 +24,7 @@ class TaskCommentResource extends JsonResource
 
             'text' => $this->body,
 
-            'createdAt' => $this->created_at->toISOString(),
+            'createdAt' => $this->created_at->toIso8601ZuluString(),
         ];
     }
 }

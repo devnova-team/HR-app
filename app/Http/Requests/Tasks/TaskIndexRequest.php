@@ -54,6 +54,7 @@ class TaskIndexRequest extends FormRequest
                 'required',
                 'integer',
                 'min:1',
+                'max:100',
             ],
         ];
     }

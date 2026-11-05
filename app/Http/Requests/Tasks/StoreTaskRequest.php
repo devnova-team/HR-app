@@ -29,11 +29,13 @@ class StoreTaskRequest extends FormRequest
             'title' => [
                 'required',
                 'string',
+                'max:225',
             ],
 
             'description' => [
                 'required',
                 'string',
+                'max:1000',
             ],
 
             'assigneeIds' => [

@@ -24,9 +24,9 @@ class UpdateTaskProgressRequest extends FormRequest
         return [
             'progress' => [
                 'required',
-                'integer',
+                'numeric',
                 'min:0',
-                'max:100',
+                'max:1',
             ],
         ];
     }

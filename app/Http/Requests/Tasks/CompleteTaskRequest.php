@@ -25,11 +25,14 @@ class CompleteTaskRequest extends FormRequest
             'summary' => [
                 'required',
                 'string',
+                'max:255',
             ],
 
             'notes' => [
                 'sometimes',
+                'nullable',
                 'string',
+                'max:500',
             ],
         ];
     }

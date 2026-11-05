@@ -27,7 +27,7 @@ class TaskResource extends JsonResource
 
             'progress' => (float) ($this->progress / 100),
 
-            'dueDate' => $this->due_date->toISOString(),
+            'dueDate' => $this->due_date->toIso8601ZuluString(),
 
             'commentsCount' => $this->comments_count,
 

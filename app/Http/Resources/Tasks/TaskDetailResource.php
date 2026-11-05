@@ -30,10 +30,10 @@ class TaskDetailResource extends JsonResource
 
             'progress' => (float) ($this->progress / 100),
 
-            'createdAt' => $this->created_at->toISOString(),
+            'createdAt' => $this->created_at->toIso8601ZuluString(),
 
             'mediaUrls' => $this->attachments
-                ->pluck('file_url')
+                ->map(fn ($attachment) => $attachment->signed_url)
                 ->values(),
 
             'assignees' => EmployeeSummaryResource::collection(
@@ -56,7 +56,7 @@ class TaskDetailResource extends JsonResource
                         $completion['notes'] = $this->completion_notes;
                     }
 
-                    $completion['completedAt'] = $this->completed_at->toISOString();
+                    $completion['completedAt'] = $this->completed_at->toIso8601ZuluString();
 
                     return $completion;
                 }
