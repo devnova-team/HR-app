@@ -45,6 +45,8 @@ class Employee extends Authenticatable
         'password' => 'hashed',
         'date_of_birth' => 'date',
         'is_verified' => 'boolean',
+        'is_first_login' => 'boolean',
+        'is_active' => 'boolean',
     ];
 
     // ------------- Relationships ----------
@@ -139,7 +141,7 @@ class Employee extends Authenticatable
     protected function avatarUrl(): Attribute
     {
         return Attribute::make(
-            get: fn() => $this->avatar_url ? Storage::disk('public')->url($this->avatar_url) : null,
+            get: fn (?string $value) => $value ? Storage::disk('public')->url($value) : null,
         );
     }
 
