@@ -6,15 +6,15 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Employee extends Authenticatable
 {
-    use HasApiTokens, HasRoles ,HasUuids;
+    use HasApiTokens, HasUuids, HasRoles;
 
     protected $fillable = [
         'level_id',
@@ -84,6 +84,21 @@ class Employee extends Authenticatable
         return $this->belongsToMany(Meeting::class, 'meeting_participants');
     }
 
+    public function employeeWorkSchedules(): HasMany
+    {
+        return $this->hasMany(EmployeeWorkSchedule::class, 'employee_id');
+    }
+
+    public function attendanceRecords():HasMany
+    {
+        return $this->hasMany(AttendanceRecord::class, 'employee_id');
+    }
+
+
+    // ---------- Accessors ----------
+
+    //full name accessor: combines first and last name into one string
+
     public function passwordResetOtps()
     {
         return $this->hasMany(PasswordResetOtp::class);
@@ -115,15 +130,16 @@ class Employee extends Authenticatable
     protected function fullName(): Attribute
     {
         return Attribute::make(
-            get: fn () => trim("{$this->first_name} {$this->last_name}"),
+            get: fn() => trim("{$this->first_name} {$this->last_name}"),
         );
     }
 
-    // avatar_link accessor: returns the full URL to the avatar image if it exists, otherwise null
+    //avatar_link accessor: returns the full URL to the avatar image if it exists, otherwise null
+
     protected function avatarUrl(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->avatar_url ? Storage::disk('public')->url($this->avatar_url) : null,
+            get: fn() => $this->avatar_url ? Storage::disk('public')->url($this->avatar_url) : null,
         );
     }
 
@@ -131,7 +147,7 @@ class Employee extends Authenticatable
     protected function positionLabel(): Attribute
     {
         return Attribute::make(
-            get: fn () => trim("{$this->level?->name} {$this->jobTitle?->name}") ?: null,
+            get: fn() => trim("{$this->level?->name} {$this->jobTitle?->name}") ?: null,
         );
     }
 
@@ -140,7 +156,7 @@ class Employee extends Authenticatable
     {
 
         return Attribute::make(
-            get: fn () => collect([
+            get: fn() => collect([
                 $this->full_address,
                 $this->city?->name,
                 $this->governorate?->name,
