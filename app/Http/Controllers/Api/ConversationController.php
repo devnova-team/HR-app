@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreConversationRequest;
 use App\Http\Resources\ConversationResource;
-use App\Repositories\ConversationRepositoryInterface;
+use App\Repositories\Interfaces\ConversationRepositoryInterface;
 use App\Services\ConversationService;
 use App\Support\ApiResponse;
 use Illuminate\Http\Request;

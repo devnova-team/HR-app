@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreMessageRequest;
 use App\Http\Resources\MessageResource;
-use App\Repositories\MessageRepositoryInterface;
+use App\Repositories\Interfaces\MessageRepositoryInterface;
 use App\Services\MessageService;
 use App\Support\ApiResponse;
 use Illuminate\Http\Request;
