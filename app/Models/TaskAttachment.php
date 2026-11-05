@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class TaskAttachment extends BaseModel
@@ -27,5 +28,13 @@ class TaskAttachment extends BaseModel
     public function task(): BelongsTo
     {
         return $this->belongsTo(Task::class);
+    }
+
+    public function getSignedUrlAttribute(): string
+    {
+        return Storage::disk("local")->temporaryUrl(
+            $this->file_url,
+            now()->addMinutes(5)
+        );
     }
 }
