@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ChangePasswordRequest;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RefreshTokenRequest;
 use App\Http\Resources\EmployeeResource;
@@ -39,7 +40,14 @@ class AuthController extends Controller
 
     public function logout(RefreshTokenRequest $request): Response
     {
-        $this->auth->logout(auth()->user(), $request->validated('refreshToken'));
+        $this->auth->logout($request->user(), $request->validated('refreshToken'));
+
+        return ApiResponse::noContent();
+    }
+
+    public function changePassword(ChangePasswordRequest $request): Response
+    {
+        $this->auth->changePassword($request->user(), $request->validated('currentPassword'), $request->validated('newPassword'));
 
         return ApiResponse::noContent();
     }
