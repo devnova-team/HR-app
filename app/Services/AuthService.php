@@ -8,6 +8,7 @@ use Illuminate\Auth\AuthenticationException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class AuthService
 {
@@ -35,7 +36,7 @@ class AuthService
                 'refresh_token' => $refreshToken,
                 'is_first_login' => $isFirstLogin,
                 // TODO: $employee->hasRole('hr') ? 'hr' : 'employee' after Spatie is merged
-                'role' => 'employee',
+                'role' => $employee->hasRole('hr') ? 'hr' : 'employee',
                 'missingFields' => $this->missingFields($employee),
                 'employee' => $employee,
             ];
@@ -127,5 +128,22 @@ class AuthService
     {
         $employee->refreshTokens()->where('token_hash', hash('sha256', trim($plainTextToken)))->whereNull('revoked_at')->update(['revoked_at' => now()]);
         $employee->currentAccessToken()->delete();
+    }
+
+    // change the password for the given employee, and revoke all refresh tokens
+    public function changePassword(Employee $employee, string $currentPassword, string $newPassword): void
+    {
+        // Check if the current password is correct
+        if (! Hash::check($currentPassword, $employee->password)) {
+            throw ValidationException::withMessages([
+                'currentPassword' => ['The current password is incorrect.'],
+            ]);
+        }
+        // Revoke every refresh token, then delete every access token
+        DB::transaction(function () use ($employee, $newPassword) {
+            $employee->update(['password' => $newPassword]);  // hashed by the cast in Employee model
+            $employee->refreshTokens()->whereNull('revoked_at')->update(['revoked_at' => now()]);
+            $employee->tokens()->delete();
+        });
     }
 }
