@@ -17,16 +17,17 @@ Route::prefix('auth')->group(function () {
     Route::post('/refresh', [AuthController::class, 'refresh'])
         ->middleware('throttle:10,1');
 
-    Route::post('/logout', [AuthController::class, 'logout'])
-        ->middleware('auth:sanctum');
+
 });
 
 // Protected Routes
 Route::middleware('auth:sanctum')->group(function () {
 
-    Route::get('/user', function (Request $request) {
-        return $request->user();
-    });
+    // Auth Routes
+    Route::post('auth/logout', [AuthController::class, 'logout']);
+
+    Route::put('auth/password', [AuthController::class, 'changePassword'])
+        ->middleware('throttle:5,1');
 
     // Notifications
     Route::get('/notifications', [NotificationController::class, 'index']);
