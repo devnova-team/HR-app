@@ -19,6 +19,11 @@ class DatabaseSeeder extends Seeder
             WorkScheduleSeeder::class,
             EmployeeWorkScheduleSeeder::class,
             AttendanceRecordSeeder::class,
+            LevelSeeder::class,
+            DepartmentSeeder::class,
+            LocationSeeder::class,
+            RolesAndPermissionsSeeder::class,
+            HrUserSeeder::class,
         ]);
     }
 }

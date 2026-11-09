@@ -3,8 +3,12 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ChangePasswordRequest;
+use App\Http\Requests\ForgotPasswordRequest;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RefreshTokenRequest;
+use App\Http\Requests\ResetPasswordRequest;
+use App\Http\Requests\VerifyOtpRequest;
 use App\Http\Resources\EmployeeResource;
 use App\Services\AuthService;
 use App\Support\ApiResponse;
@@ -39,7 +43,46 @@ class AuthController extends Controller
 
     public function logout(RefreshTokenRequest $request): Response
     {
-        $this->auth->logout(auth()->user(), $request->validated('refreshToken'));
+        $this->auth->logout($request->user(), $request->validated('refreshToken'));
+
+        return ApiResponse::noContent();
+    }
+
+    public function changePassword(ChangePasswordRequest $request): Response
+    {
+        $this->auth->changePassword($request->user(), $request->validated('currentPassword'), $request->validated('newPassword'));
+
+        return ApiResponse::noContent();
+    }
+
+    // forget password
+    public function forgotPassword(ForgotPasswordRequest $request): JsonResponse
+    {
+        $this->auth->forgetPassword($request->validated('email'));
+
+        return ApiResponse::success([
+            'message' => 'OTP sent to your email.',
+        ]);
+    }
+
+    // verify otp
+    public function verifyOtp(VerifyOtpRequest $request): JsonResponse
+    {
+        $resetToken = $this->auth->verifyOtp(
+            $request->validated('email'),
+            $request->validated('otp')
+        );
+
+        return ApiResponse::success(['resetToken' => $resetToken]);
+
+    }
+
+    public function resetPassword(ResetPasswordRequest $request): Response
+    {
+        $this->auth->resetPassword(
+            $request->validated('resetToken'),
+            $request->validated('newPassword'),
+        );
 
         return ApiResponse::noContent();
     }

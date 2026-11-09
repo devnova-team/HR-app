@@ -6,7 +6,6 @@ use App\Http\Controllers\Api\EmployeePushTokenController;
 use App\Http\Controllers\Api\MessageController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Auth\AuthController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // Auth Routes
@@ -17,16 +16,26 @@ Route::prefix('auth')->group(function () {
     Route::post('/refresh', [AuthController::class, 'refresh'])
         ->middleware('throttle:10,1');
 
-    Route::post('/logout', [AuthController::class, 'logout'])
-        ->middleware('auth:sanctum');
+    Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])
+        ->middleware('throttle:forgot-password');
+
+    Route::post('/verify-otp', [AuthController::class, 'verifyOtp'])
+        ->middleware('throttle:verify-otp');
+
+    Route::post('/reset-password', [AuthController::class, 'resetPassword'])
+        ->middleware('throttle:reset-password');
+
 });
+
 
 // Protected Routes
 Route::middleware('auth:sanctum')->group(function () {
 
-    Route::get('/user', function (Request $request) {
-        return $request->user();
-    });
+    // Auth Routes
+    Route::post('auth/logout', [AuthController::class, 'logout']);
+
+    Route::put('auth/password', [AuthController::class, 'changePassword'])
+        ->middleware('throttle:5,1');
 
     // Notifications
     Route::get('/notifications', [NotificationController::class, 'index']);
