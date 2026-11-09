@@ -2,11 +2,14 @@
 
 namespace App\Services;
 
+use App\Mail\PasswordResetOtpMail;
 use App\Models\Employee;
+use App\Models\PasswordResetOtp;
 use App\Models\RefreshToken;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
@@ -144,6 +147,111 @@ class AuthService
             $employee->update(['password' => $newPassword]);  // hashed by the cast in Employee model
             $employee->refreshTokens()->whereNull('revoked_at')->update(['revoked_at' => now()]);
             $employee->tokens()->delete();
+        });
+    }
+
+    //Forget password to reset the password for employee by sending a reset link to the email
+    public function forgetPassword(string $email): void
+    {
+        $employee = Employee::where('email', $email)->where('is_active', true)->first();
+        if (!$employee ) {
+            return;
+        }
+
+        //create otp
+        $otp = (string) random_int(100000, 999999);
+        $ttl = (int) config('hr.otp_ttl_minutes');
+
+        DB::transaction(function ()use($employee, $otp, $ttl) {
+            $employee->passwordResetOtps()->whereNull('used_at')->update(['used_at' => now()]); // Revoke any previous unused OTPs
+            $employee->passwordResetOtps()->create([
+                'otp_hash' => Hash::make($otp),
+                'expires_at' => now()->addMinutes($ttl),
+            ]);
+        });
+
+        // Queue the email only after the OTP row is committed
+        Mail::to($employee->email)->queue(new PasswordResetOtpMail($employee->first_name, $otp, $ttl));
+
+    }
+
+    // verify the OTP for the given email and reset token
+    public function verifyOtp(string $email, string $otp)
+    {
+        $email  = Str::lower(trim($email));
+        $maxAttempts = (int) config('hr.otp_max_attempts', 5);
+
+        $resetToken = DB::transaction(function() use($email, $otp, $maxAttempts){
+         $employee = Employee::where('email', $email)->where('is_active', true)->first();
+        if (!$employee ) {
+            return;
+        }
+
+        // get the latest unused OTP for the employee
+        $otpRecord = $employee->passwordResetOtps()->whereNull('used_at')->whereNull('verified_at')->latest()->lockForUpdate()->first();
+
+        // check if the OTP is valid and not expired and the attempts are less than 5
+        if (!$otpRecord || $otpRecord->expires_at->isPast() || $otpRecord->attempts >= $maxAttempts) {
+           return null;
+        }
+
+        if (!Hash::check($otp, $otpRecord->otp_hash)){
+            $otpRecord->increment('attempts');
+
+            // increment the attempts
+            if ($otpRecord->attemtps >= $maxAttempts) {
+                $otpRecord->update(['used_at' => now()]);
+            }
+            return null;
+        }
+
+
+        // create reset token
+        $plainToken = Str::random(64);
+
+        $otpRecord->update([
+            'verified_at' => now(),
+            'reset_token_hash' => hash('sha256', $plainToken),
+            'reset_token_expires_at' => now()->addMinutes((int) config('hr.reset_token_ttl_minutes')),
+        ]);
+
+        return $plainToken;
+    });
+
+    // Throw AFTER the transaction so the failed-attempt increment is not rolled back
+    if (! $resetToken) {
+        throw ValidationException::withMessages([
+            'otp' => ['Invalid or expired OTP.'],
+        ]);
+    }
+
+    return $resetToken;
+
+    }
+
+    public function resetPassword( string $resetToken, string $newPassword):void
+    {
+        $resetTokenHash = hash('sha256', trim($resetToken));
+
+        DB::transaction(function() use($resetTokenHash, $newPassword){
+
+           // get the OTP record with the given reset token hash and check if it is valid and not expired
+            $record = PasswordResetOtp::with('employee')->whereNotNull('verified_at')->where('reset_token_hash', $resetTokenHash)->whereNull('used_at')->lockForUpdate()->first();
+
+            if (!$record || $record->reset_token_expires_at->isPast() || ! $record->employee->is_active) {
+                throw ValidationException::withMessages([
+                    'resetToken' => ['Invalid or expired reset token.'],
+                ]);
+            }
+
+            // Update the employee's password, revoke all refresh tokens, and delete all access tokens
+            $employee = $record->employee;
+            $employee->update(['password' => $newPassword]);  // hashed by the cast in Employee model
+            $employee->refreshTokens()->whereNull('revoked_at')->update(['revoked_at' => now()]);
+            $employee->tokens()->delete();
+
+            // Mark the reset token as used
+            $employee->passwordResetOtps()->whereNull('used_at')->update(['used_at' => now()]);
         });
     }
 }
