@@ -6,6 +6,9 @@ use App\Http\Controllers\Api\EmployeePushTokenController;
 use App\Http\Controllers\Api\MessageController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Api\TaskController;
+use App\Http\Controllers\Api\TaskWorkflowController;
+use App\Http\Controllers\Api\TaskCommentController;
 use Illuminate\Support\Facades\Route;
 
 // Auth Routes
@@ -54,3 +57,29 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/conversations/{conversationId}/messages', [MessageController::class, 'store']);
     Route::patch('/conversations/{conversationId}/read', [MessageController::class, 'markAsRead']);
 });
+
+// Tasks
+Route::prefix('tasks')
+    ->middleware('auth:sanctum')
+    ->group(function () {
+
+        Route::get('/today', [TaskController::class, 'today']);
+        Route::get('/summary', [TaskController::class, 'summary']);
+        Route::get('/permissions', [TaskController::class, 'permissions']);
+        Route::get('/assignable-employees', [TaskController::class, 'assignableEmployees']);
+
+        Route::get('/', [TaskController::class, 'index']);
+        Route::post('/', [TaskController::class, 'store']);
+        Route::get('/{task}', [TaskController::class, 'show']);
+
+        // Comments
+        Route::prefix('{task}/comments')->group(function () {
+            Route::get('/', [TaskCommentController::class, 'index']);
+            Route::post('/', [TaskCommentController::class, 'store']);
+        });
+
+        // Workflow
+        Route::post('/{task}/start', [TaskWorkflowController::class, 'start']);
+        Route::patch('/{task}/progress', [TaskWorkflowController::class, 'updateProgress']);
+        Route::post('/{task}/complete', [TaskWorkflowController::class, 'complete']);
+    });

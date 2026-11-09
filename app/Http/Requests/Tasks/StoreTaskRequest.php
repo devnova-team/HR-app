@@ -46,11 +46,6 @@ class StoreTaskRequest extends FormRequest
             'assigneeIds.*' => [
                 'required',
                 'string',
-                'distinct',
-                Rule::exists('employees', 'id'),
-                Rule::notIn([
-                    $this->user()->getAuthIdentifier(),
-                ]),
             ],
 
             'priority' => [
