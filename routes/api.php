@@ -6,7 +6,6 @@ use App\Http\Controllers\Api\EmployeePushTokenController;
 use App\Http\Controllers\Api\MessageController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Auth\AuthController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // Auth Routes
@@ -17,8 +16,17 @@ Route::prefix('auth')->group(function () {
     Route::post('/refresh', [AuthController::class, 'refresh'])
         ->middleware('throttle:10,1');
 
+    Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])
+        ->middleware('throttle:forgot-password');
+
+    Route::post('/verify-otp', [AuthController::class, 'verifyOtp'])
+        ->middleware('throttle:verify-otp');
+
+    Route::post('/reset-password', [AuthController::class, 'resetPassword'])
+        ->middleware('throttle:reset-password');
 
 });
+
 
 // Protected Routes
 Route::middleware('auth:sanctum')->group(function () {
