@@ -2,6 +2,12 @@
 
 namespace App\Providers;
 
+use App\Repositories\AttendanceRepository;
+use App\Repositories\CompanySettingRepository;
+use App\Repositories\WorkScheduleRepository;
+use App\Repositories\Interfaces\AttendanceRepositoryInterface;
+use App\Repositories\Interfaces\CompanySettingRepositoryInterface;
+use App\Repositories\Interfaces\WorkScheduleRepositoryInterface;
 use App\Repositories\ConversationRepository;
 use App\Repositories\EmployeePushTokenRepository;
 use App\Repositories\Interfaces\ConversationRepositoryInterface;
@@ -20,10 +26,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind(NotificationRepositoryInterface::class,NotificationRepository::class);
-        $this->app->bind(ConversationRepositoryInterface::class,ConversationRepository::class);
-        $this->app->bind(MessageRepositoryInterface::class,MessageRepository::class);
-        $this->app->bind(EmployeePushTokenRepositoryInterface::class,EmployeePushTokenRepository::class);
+        $this->app->bind(NotificationRepositoryInterface::class, NotificationRepository::class);
+        $this->app->bind(ConversationRepositoryInterface::class, ConversationRepository::class);
+        $this->app->bind(MessageRepositoryInterface::class, MessageRepository::class);
+        $this->app->bind(EmployeePushTokenRepositoryInterface::class, EmployeePushTokenRepository::class);
+        $this->app->bind(AttendanceRepositoryInterface::class, AttendanceRepository::class);
+        $this->app->bind(WorkScheduleRepositoryInterface::class, WorkScheduleRepository::class);
+        $this->app->bind(CompanySettingRepositoryInterface::class, CompanySettingRepository::class);
     }
 
     /**
