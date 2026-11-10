@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -12,6 +13,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
+
 
 class Employee extends Authenticatable
 {
@@ -154,6 +156,35 @@ class Employee extends Authenticatable
             'employee_id',
             'task_id'
         );
+    }
+
+    // Check if the employee can assign tasks.
+    public function canAssignTasks(): bool
+    {
+        $minimumRank = (int) config('hr.task_min_assigner_rank', 3);
+
+        return $this->level !== null
+            && $this->level->rank >= $minimumRank;
+    }
+
+    // Get employees that can be assigned tasks by the given employee.
+    public function scopeAssignableBy(
+        Builder $query,
+        Employee $assigner
+    ): Builder {
+        if (! $assigner->canAssignTasks()) {
+            return $query->whereRaw('1 = 0');
+        }
+
+        $assignerRank = $assigner->level->rank;
+
+        return $query
+            ->where('employees.department_id', $assigner->department_id)
+            ->where('employees.is_active', true)
+            ->where('employees.id', '<>', $assigner->getKey())
+            ->whereHas('level', function (Builder $levelQuery) use ($assignerRank) {
+                $levelQuery->where('rank', '<', $assignerRank);
+            });
     }
 
     // ---------- Accessors ----------

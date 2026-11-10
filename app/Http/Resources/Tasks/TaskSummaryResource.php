@@ -15,11 +15,9 @@ class TaskSummaryResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'toDoCount' => (int) $this->toDoCount,
-
-            'inProgressCount' => (int) $this->inProgressCount,
-
-            'doneCount' => (int) $this->doneCount,
+            'toDoCount' => (int) ($this->resource['toDoCount'] ?? 0),
+            'inProgressCount' => (int) ($this->resource['inProgressCount'] ?? 0),
+            'doneCount' => (int) ($this->resource['doneCount'] ?? 0),
         ];
     }
 }
