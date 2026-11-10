@@ -1,3 +1,4 @@
+
 <?php
 
 use App\Http\Controllers\Api\ConversationController;
@@ -40,7 +41,6 @@ Route::prefix('auth')->group(function () {
 // Protected Routes
 Route::middleware('auth:sanctum')->group(function () {
 
-    // Auth Routes
     Route::post('auth/logout', [AuthController::class, 'logout']);
 
     Route::put('auth/password', [AuthController::class, 'changePassword'])

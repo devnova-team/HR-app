@@ -11,13 +11,10 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
-/**
- * Read-only. Every query is scoped to the signed-in employee, so someone else's
- * record id returns 404 (never 403) and nothing is calculated here.
- */
+
 class PayrollController extends Controller
 {
-    /** GET /me/payroll */
+    
     public function index(Request $request): JsonResponse
     {
         $paginator = PayrollRecord::query()
@@ -28,7 +25,7 @@ class PayrollController extends Controller
         return ApiPagination::respond($paginator, PayrollItemResource::class);
     }
 
-    /** GET /me/payroll/{id} */
+    
     public function show(Request $request, string $id): JsonResponse
     {
         return response()->json([
@@ -36,7 +33,7 @@ class PayrollController extends Controller
         ]);
     }
 
-    /** GET /me/payroll/{id}/pdf */
+    
     public function pdf(Request $request, string $id): Response
     {
         $record = $this->ownRecord($request, $id);

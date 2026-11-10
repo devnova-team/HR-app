@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 
 class AssetController extends Controller
 {
-    /** GET /me/assets: assets the employee currently holds (not returned), newest first. */
+    
     public function __invoke(Request $request): JsonResponse
     {
         $items = EmployeeAsset::query()
