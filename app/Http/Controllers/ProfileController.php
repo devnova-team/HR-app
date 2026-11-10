@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\UpdateAvatarRequest;
 use App\Http\Requests\UpdatePersonalDataRequest;
-use App\Http\Resources\EmployeeResource; // built by Kareem
+use App\Http\Resources\EmployeeResource; 
 use App\Http\Resources\PersonalDataResource;
 use App\Models\Employee;
 use Illuminate\Http\JsonResponse;
@@ -17,7 +17,7 @@ class ProfileController extends Controller
     /** Relations needed to build PersonalData and EmployeeResource (defined on Employee by Moaz). */
     private const PROFILE_RELATIONS = ['level', 'department', 'jobTitle', 'country', 'governorate', 'city'];
 
-    /** GET /me */
+    
     public function show(Request $request): JsonResponse
     {
         return response()->json([
@@ -25,7 +25,7 @@ class ProfileController extends Controller
         ]);
     }
 
-    /** GET /me/personal-data */
+    
     public function personalData(Request $request): JsonResponse
     {
         return $this->personalDataResponse($this->employee($request));
@@ -44,7 +44,7 @@ class ProfileController extends Controller
         return $this->personalDataResponse($employee->refresh()->loadMissing(self::PROFILE_RELATIONS));
     }
 
-    /** PUT /me/avatar: stored on the public disk because colleagues see it in lists and chat. */
+
     public function updateAvatar(UpdateAvatarRequest $request): JsonResponse
     {
         $employee = $request->user();

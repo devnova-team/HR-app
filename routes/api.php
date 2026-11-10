@@ -8,7 +8,8 @@ use Illuminate\Support\Facades\Route;
 use Laravel\Sanctum\Http\Middleware\CheckForAnyAbility;
 
 Route::middleware(['auth:sanctum', CheckForAnyAbility::class.':access'])->group(function () {
-    // Burnout (static /tasks/* routes first)
+    // Burnout 
+ 
     Route::get('/tasks/burnout', [BurnoutController::class, 'stats']);
     Route::get('/tasks/burnout/details', [BurnoutController::class, 'details']);
 
