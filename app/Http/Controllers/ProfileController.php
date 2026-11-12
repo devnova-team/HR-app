@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\UpdateAvatarRequest;
 use App\Http\Requests\UpdatePersonalDataRequest;
-use App\Http\Resources\EmployeeResource; 
+use App\Http\Resources\EmployeeResource;
 use App\Http\Resources\PersonalDataResource;
 use App\Models\Employee;
 use Illuminate\Http\JsonResponse;
@@ -17,7 +17,7 @@ class ProfileController extends Controller
     /** Relations needed to build PersonalData and EmployeeResource (defined on Employee by Moaz). */
     private const PROFILE_RELATIONS = ['level', 'department', 'jobTitle', 'country', 'governorate', 'city'];
 
-    
+    /** GET /me */
     public function show(Request $request): JsonResponse
     {
         return response()->json([
@@ -25,7 +25,7 @@ class ProfileController extends Controller
         ]);
     }
 
-    
+    /** GET /me/personal-data */
     public function personalData(Request $request): JsonResponse
     {
         return $this->personalDataResponse($this->employee($request));
@@ -44,11 +44,18 @@ class ProfileController extends Controller
         return $this->personalDataResponse($employee->refresh()->loadMissing(self::PROFILE_RELATIONS));
     }
 
-
+    /**
+     * PUT /me/avatar
+     *
+     * The DB stores the RELATIVE path (avatars/xxx.jpg); the Employee::avatarUrl
+     * accessor turns it into a full URL on read, so the URL is built in one place only.
+     */
     public function updateAvatar(UpdateAvatarRequest $request): JsonResponse
     {
         $employee = $request->user();
         $file = $request->file('photo');
+
+        $oldPath = $employee->getRawOriginal('avatar_url');
 
         $path = $file->storeAs(
             'avatars',
@@ -56,9 +63,8 @@ class ProfileController extends Controller
             'public',
         );
 
-        $oldUrl = $employee->avatar_url;
-        $employee->forceFill(['avatar_url' => url(Storage::disk('public')->url($path))])->save();
-        $this->deleteOldAvatar($oldUrl);
+        $employee->forceFill(['avatar_url' => $path])->save();
+        $this->deleteOldAvatar($oldPath);
 
         return response()->json(['data' => ['avatarUrl' => $employee->avatar_url]]);
     }
@@ -73,20 +79,13 @@ class ProfileController extends Controller
         return response()->json(['data' => (new PersonalDataResource($employee))->resolve()]);
     }
 
-    private function deleteOldAvatar(?string $url): void
+    /** Delete the previous avatar from disk, only if it is one of ours (avatars/ folder). */
+    private function deleteOldAvatar(?string $path): void
     {
-        if (! $url) {
-            return;
+        if (! $path || ! str_starts_with($path, 'avatars/')) {
+            return; // empty, or not one of ours (e.g. a seeded external URL)
         }
 
-        $prefix = url(Storage::disk('public')->url(''));
-        if (! str_starts_with($url, $prefix)) {
-            return; // not one of ours (e.g. a seeded external URL)
-        }
-
-        $relative = substr($url, strlen($prefix));
-        if (str_starts_with($relative, 'avatars/')) {
-            Storage::disk('public')->delete($relative);
-        }
+        Storage::disk('public')->delete($path);
     }
 }
