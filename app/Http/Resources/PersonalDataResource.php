@@ -16,15 +16,17 @@ class PersonalDataResource extends JsonResource
             'lastName' => $this->last_name,
             'dateOfBirth' => ApiDate::isoDate($this->date_of_birth),
             'avatarUrl' => $this->avatar_url,
+
             'position' => [
-                'level' => $this->level->name,
-                'department' => $this->department->name,
-                'jobTitle' => $this->jobTitle->name,
+                'level' => $this->level?->name,
+                'department' => $this->department?->name,
+                'jobTitle' => $this->jobTitle?->name,
             ],
+
             'address' => [
-                'country' => $this->country->name,
-                'governorate' => $this->governorate->name,
-                'city' => $this->city->name,
+                'country' => $this->country?->name,
+                'governorate' => $this->governorate?->name,
+                'city' => $this->city?->name,
                 'fullAddress' => $this->full_address,
             ],
         ];
