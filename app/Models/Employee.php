@@ -129,7 +129,15 @@ class Employee extends Authenticatable
     {
         return $this->hasMany(EmployeePushToken::class);
     }
+public function employeeAssets(): HasMany
+{
+    return $this->hasMany(EmployeeAsset::class);
+}
 
+public function payrollRecords(): HasMany
+{
+    return $this->hasMany(PayrollRecord::class);
+}
     // Password Reset OTPs
     public function passwordResetOtps(): HasMany
     {

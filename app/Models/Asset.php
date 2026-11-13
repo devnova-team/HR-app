@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Asset extends BaseModel
 {
@@ -18,5 +19,10 @@ class Asset extends BaseModel
             'is_under_warranty' => 'boolean',
             'purchase_date' => 'date',
         ];
+    }
+
+    public function employeeAssets(): HasMany
+    {
+        return $this->hasMany(EmployeeAsset::class);
     }
 }
