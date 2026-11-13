@@ -3,14 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class EmployeeAsset extends Model
+class EmployeeAsset extends BaseModel
 {
-    use HasUuids;
-
     public $timestamps = false;
 
     protected $fillable = ['employee_id', 'asset_id', 'assigned_at', 'returned_at'];

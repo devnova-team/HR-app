@@ -2,14 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class PayrollRecord extends Model
+class PayrollRecord extends BaseModel
 {
-    use HasFactory, HasUuids;
+    use HasFactory;
 
     protected $fillable = [
         'employee_id', 'period_start', 'period_end',
