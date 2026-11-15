@@ -66,7 +66,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/conversations/{conversationId}/messages', [MessageController::class, 'index']);
     Route::post('/conversations/{conversationId}/messages', [MessageController::class, 'store']);
     Route::patch('/conversations/{conversationId}/read', [MessageController::class, 'markAsRead']);
-
+});
     // Profile, Assets, Payroll and Burnout
     Route::middleware(CheckForAnyAbility::class . ':access')->group(function () {
 
@@ -130,3 +130,4 @@ Route::prefix('tasks')
         Route::patch('/{task}/progress', [TaskWorkflowController::class, 'updateProgress']);
         Route::post('/{task}/complete', [TaskWorkflowController::class, 'complete']);
     });
+
