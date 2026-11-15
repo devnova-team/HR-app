@@ -10,11 +10,19 @@ use App\Http\Controllers\Api\EmployeePushTokenController;
 use App\Http\Controllers\Api\MeetingController;
 use App\Http\Controllers\Api\MessageController;
 use App\Http\Controllers\Api\NotificationController;
-use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Api\TaskController;
 use App\Http\Controllers\Api\TaskWorkflowController;
 use App\Http\Controllers\Api\TaskCommentController;
+use App\Http\Controllers\Auth\AuthController;
+
+use App\Http\Controllers\AssetController;
+use App\Http\Controllers\BurnoutController;
+use App\Http\Controllers\PayrollController;
+use App\Http\Controllers\ProfileController;
+
 use Illuminate\Support\Facades\Route;
+use Laravel\Sanctum\Http\Middleware\CheckForAnyAbility;
+
 
 // Auth Routes
 Route::prefix('auth')->group(function () {
@@ -32,13 +40,11 @@ Route::prefix('auth')->group(function () {
 
     Route::post('/reset-password', [AuthController::class, 'resetPassword'])
         ->middleware('throttle:reset-password');
-
 });
 
 // Protected Routes
 Route::middleware('auth:sanctum')->group(function () {
 
-    // Auth Routes
     Route::post('auth/logout', [AuthController::class, 'logout']);
 
     Route::put('auth/password', [AuthController::class, 'changePassword'])
@@ -60,6 +66,27 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/conversations/{conversationId}/messages', [MessageController::class, 'index']);
     Route::post('/conversations/{conversationId}/messages', [MessageController::class, 'store']);
     Route::patch('/conversations/{conversationId}/read', [MessageController::class, 'markAsRead']);
+
+    // Profile, Assets, Payroll and Burnout
+    Route::middleware(CheckForAnyAbility::class . ':access')->group(function () {
+
+        // Burnout
+        Route::get('/tasks/burnout', [BurnoutController::class, 'stats']);
+        Route::get('/tasks/burnout/details', [BurnoutController::class, 'details']);
+
+        // Profile
+        Route::get('/me', [ProfileController::class, 'show']);
+        Route::get('/me/personal-data', [ProfileController::class, 'personalData']);
+        Route::patch('/me/personal-data', [ProfileController::class, 'updatePersonalData']);
+        Route::put('/me/avatar', [ProfileController::class, 'updateAvatar']);
+
+        // Assets
+        Route::get('/me/assets', AssetController::class);
+
+        // Payroll
+        Route::get('/me/payroll', [PayrollController::class, 'index']);
+        Route::get('/me/payroll/{id}', [PayrollController::class, 'show'])->whereUuid('id');
+        Route::get('/me/payroll/{id}/pdf', [PayrollController::class, 'pdf'])->whereUuid('id');
     // Departments
     Route::get('/departments', [DepartmentController::class, 'index']);
     // Employees
@@ -76,6 +103,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/locations/governorates/{governorateId}/cities', [LocationController::class, 'cities'])->whereUuid('governorateId');
     });
 });
+
 
 // Tasks
 Route::prefix('tasks')
