@@ -15,9 +15,9 @@ return new class extends Migration
             $table->uuid('id')->primary();
 
             // Foreign Keys (Organization)
-            $table->foreignUuid('level_id')->nullable()->constrained('levels')->nullOnDelete();
-            $table->foreignUuid('department_id')->nullable()->constrained('departments')->nullOnDelete();
-            $table->foreignUuid('job_title_id')->nullable()->constrained('job_titles')->nullOnDelete();
+            $table->foreignUuid('level_id')->constrained('levels');
+            $table->foreignUuid('department_id')->constrained('departments');
+            $table->foreignUuid('job_title_id')->constrained('job_titles');
 
             // Foreign Keys (Location)
             $table->foreignUuid('country_id')->nullable()->constrained('countries')->nullOnDelete();
