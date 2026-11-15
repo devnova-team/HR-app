@@ -1,8 +1,13 @@
 
 <?php
 
+use App\Http\Controllers\Admin\LocationController;
+use App\Http\Controllers\Admin\LookupController;
 use App\Http\Controllers\Api\ConversationController;
+use App\Http\Controllers\Api\DepartmentController;
+use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\EmployeePushTokenController;
+use App\Http\Controllers\Api\MeetingController;
 use App\Http\Controllers\Api\MessageController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\TaskController;
@@ -36,7 +41,6 @@ Route::prefix('auth')->group(function () {
     Route::post('/reset-password', [AuthController::class, 'resetPassword'])
         ->middleware('throttle:reset-password');
 });
-
 
 // Protected Routes
 Route::middleware('auth:sanctum')->group(function () {
@@ -83,6 +87,20 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/me/payroll', [PayrollController::class, 'index']);
         Route::get('/me/payroll/{id}', [PayrollController::class, 'show'])->whereUuid('id');
         Route::get('/me/payroll/{id}/pdf', [PayrollController::class, 'pdf'])->whereUuid('id');
+    // Departments
+    Route::get('/departments', [DepartmentController::class, 'index']);
+    // Employees
+    Route::get('/employees', [EmployeeController::class, 'index']);
+    // Meetings
+    Route::get('/meetings/today', [MeetingController::class, 'today']);
+    // Admin
+    Route::prefix('admin')->middleware('role:hr')->group(function () {
+        // Lookups
+        Route::get('/lookups/positions', [LookupController::class, 'positions']);
+        // Locations
+        Route::get('/locations/countries', [LocationController::class, 'countries']);
+        Route::get('/locations/countries/{countryId}/governorates', [LocationController::class, 'governorates'])->whereUuid('countryId');
+        Route::get('/locations/governorates/{governorateId}/cities', [LocationController::class, 'cities'])->whereUuid('governorateId');
     });
 });
 
