@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\CompanySetting;
 use App\Models\Employee;
+use App\Models\Meeting;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -23,5 +24,21 @@ class MeetingRepository
     public function companyTimezone(): ?string
     {
         return CompanySetting::query()->value('timezone');
+    }
+
+    public function create(array $data): Meeting
+    {
+        return Meeting::create($data);
+    }
+
+    /** @param array<int, string> $employeeIds */
+    public function syncParticipants(Meeting $meeting, array $employeeIds): void
+    {
+        $meeting->participants()->sync($employeeIds);
+    }
+
+    public function findWithParticipants(string $id): Meeting
+    {
+        return Meeting::with(['participants.level', 'participants.jobTitle'])->findOrFail($id);
     }
 }

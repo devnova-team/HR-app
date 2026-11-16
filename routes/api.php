@@ -1,6 +1,8 @@
 
 <?php
 
+use App\Http\Controllers\Admin\AdminEmployeeController;
+use App\Http\Controllers\Admin\AdminMeetingController;
 use App\Http\Controllers\Admin\LocationController;
 use App\Http\Controllers\Admin\LookupController;
 use App\Http\Controllers\Api\ConversationController;
@@ -101,7 +103,15 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/locations/countries', [LocationController::class, 'countries']);
         Route::get('/locations/countries/{countryId}/governorates', [LocationController::class, 'governorates'])->whereUuid('countryId');
         Route::get('/locations/governorates/{governorateId}/cities', [LocationController::class, 'cities'])->whereUuid('governorateId');
+        // Employees
+        Route::get('/employees', [AdminEmployeeController::class, 'index']);
+        Route::post('/employees', [AdminEmployeeController::class, 'store']);
+        Route::patch('/employees/{id}', [AdminEmployeeController::class, 'update'])->whereUuid('id');
+
+        // Meetings
+        Route::post('/meetings', [AdminMeetingController::class, 'store']);
     });
+
 });
 
 
