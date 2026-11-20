@@ -128,15 +128,17 @@ class Employee extends Authenticatable
     {
         return $this->hasMany(EmployeePushToken::class);
     }
-public function employeeAssets(): HasMany
-{
-    return $this->hasMany(EmployeeAsset::class);
-}
 
-public function payrollRecords(): HasMany
-{
-    return $this->hasMany(PayrollRecord::class);
-}
+    public function employeeAssets(): HasMany
+    {
+        return $this->hasMany(EmployeeAsset::class);
+    }
+
+    public function payrollRecords(): HasMany
+    {
+        return $this->hasMany(PayrollRecord::class);
+    }
+
     // Password Reset OTPs
     public function passwordResetOtps(): HasMany
     {
@@ -187,6 +189,18 @@ public function payrollRecords(): HasMany
     public function reviewedLeaveRequests(): HasMany
     {
         return $this->hasMany(LeaveRequest::class, 'reviewed_by_id');
+    }
+
+    // Expenses
+    public function expenses(): HasMany
+    {
+        return $this->hasMany(Expense::class);
+    }
+
+    // Reviewed Expenses
+    public function reviewedExpenses(): HasMany
+    {
+        return $this->hasMany(Expense::class, 'reviewed_by_id');
     }
 
     // Check if the employee can assign tasks.

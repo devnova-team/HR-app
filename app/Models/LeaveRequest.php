@@ -48,6 +48,16 @@ class LeaveRequest extends BaseModel
         ];
     }
 
+    public function getTotalDaysAttribute(): float
+    {
+        return (float) $this->days_count;
+    }
+
+    public function getRequestDateAttribute()
+    {
+        return $this->created_at;
+    }
+
     public function employee(): BelongsTo
     {
         return $this->belongsTo(Employee::class);
