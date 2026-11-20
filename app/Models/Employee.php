@@ -14,10 +14,9 @@ use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
-
 class Employee extends Authenticatable
 {
-    use HasApiTokens, HasUuids, HasRoles, HasFactory;
+    use HasApiTokens, HasFactory, HasRoles, HasUuids;
 
     protected $fillable = [
         'level_id',
@@ -129,15 +128,17 @@ class Employee extends Authenticatable
     {
         return $this->hasMany(EmployeePushToken::class);
     }
-public function employeeAssets(): HasMany
-{
-    return $this->hasMany(EmployeeAsset::class);
-}
 
-public function payrollRecords(): HasMany
-{
-    return $this->hasMany(PayrollRecord::class);
-}
+    public function employeeAssets(): HasMany
+    {
+        return $this->hasMany(EmployeeAsset::class);
+    }
+
+    public function payrollRecords(): HasMany
+    {
+        return $this->hasMany(PayrollRecord::class);
+    }
+
     // Password Reset OTPs
     public function passwordResetOtps(): HasMany
     {
@@ -164,6 +165,42 @@ public function payrollRecords(): HasMany
             'employee_id',
             'task_id'
         );
+    }
+
+    // Leave Balances
+    public function leaveBalances(): HasMany
+    {
+        return $this->hasMany(EmployeeLeaveBalance::class);
+    }
+
+    // Leave Requests
+    public function leaveRequests(): HasMany
+    {
+        return $this->hasMany(LeaveRequest::class);
+    }
+
+    // Delegated Leave Requests
+    public function delegatedLeaveRequests(): HasMany
+    {
+        return $this->hasMany(LeaveRequest::class, 'task_delegate_id');
+    }
+
+    // Reviewed Leave Requests
+    public function reviewedLeaveRequests(): HasMany
+    {
+        return $this->hasMany(LeaveRequest::class, 'reviewed_by_id');
+    }
+
+    // Expenses
+    public function expenses(): HasMany
+    {
+        return $this->hasMany(Expense::class);
+    }
+
+    // Reviewed Expenses
+    public function reviewedExpenses(): HasMany
+    {
+        return $this->hasMany(Expense::class, 'reviewed_by_id');
     }
 
     // Check if the employee can assign tasks.
@@ -201,7 +238,7 @@ public function payrollRecords(): HasMany
     protected function fullName(): Attribute
     {
         return Attribute::make(
-            get: fn() => trim("{$this->first_name} {$this->last_name}"),
+            get: fn () => trim("{$this->first_name} {$this->last_name}"),
         );
     }
 
@@ -219,7 +256,7 @@ public function payrollRecords(): HasMany
     protected function positionLabel(): Attribute
     {
         return Attribute::make(
-            get: fn() => trim("{$this->level?->name} {$this->jobTitle?->name}") ?: null,
+            get: fn () => trim("{$this->level?->name} {$this->jobTitle?->name}") ?: null,
         );
     }
 
@@ -227,7 +264,7 @@ public function payrollRecords(): HasMany
     protected function address(): Attribute
     {
         return Attribute::make(
-            get: fn() => collect([
+            get: fn () => collect([
                 $this->full_address,
                 $this->city?->name,
                 $this->governorate?->name,

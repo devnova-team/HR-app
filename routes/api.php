@@ -9,22 +9,21 @@ use App\Http\Controllers\Api\ConversationController;
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\EmployeePushTokenController;
+use App\Http\Controllers\Api\ExpenseController;
+use App\Http\Controllers\Api\LeaveController;
 use App\Http\Controllers\Api\MeetingController;
 use App\Http\Controllers\Api\MessageController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\TaskCommentController;
 use App\Http\Controllers\Api\TaskController;
 use App\Http\Controllers\Api\TaskWorkflowController;
-use App\Http\Controllers\Api\TaskCommentController;
-use App\Http\Controllers\Auth\AuthController;
-
 use App\Http\Controllers\AssetController;
+use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\BurnoutController;
 use App\Http\Controllers\PayrollController;
 use App\Http\Controllers\ProfileController;
-
 use Illuminate\Support\Facades\Route;
 use Laravel\Sanctum\Http\Middleware\CheckForAnyAbility;
-
 
 // Auth Routes
 Route::prefix('auth')->group(function () {
@@ -68,27 +67,44 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/conversations/{conversationId}/messages', [MessageController::class, 'index']);
     Route::post('/conversations/{conversationId}/messages', [MessageController::class, 'store']);
     Route::patch('/conversations/{conversationId}/read', [MessageController::class, 'markAsRead']);
+
+    // Expenses (Employee)
+    Route::prefix('expenses')->group(function () {
+        Route::get('/categories', [ExpenseController::class, 'categories']);
+        Route::get('/', [ExpenseController::class, 'index']);
+        Route::post('/', [ExpenseController::class, 'store']);
+        Route::get('/{id}', [ExpenseController::class, 'show'])->whereUuid('id');
+    });
+
+    // Leaves (Employee)
+    Route::prefix('leaves')->group(function () {
+        Route::get('/categories', [LeaveController::class, 'categories']);
+        Route::get('/balances', [LeaveController::class, 'balances']);
+        Route::get('/', [LeaveController::class, 'index']);
+        Route::post('/', [LeaveController::class, 'store']);
+        Route::get('/{id}', [LeaveController::class, 'show'])->whereUuid('id');
+    });
 });
-    // Profile, Assets, Payroll and Burnout
-    Route::middleware(CheckForAnyAbility::class . ':access')->group(function () {
+// Profile, Assets, Payroll and Burnout
+Route::middleware(CheckForAnyAbility::class.':access')->group(function () {
 
-        // Burnout
-        Route::get('/tasks/burnout', [BurnoutController::class, 'stats']);
-        Route::get('/tasks/burnout/details', [BurnoutController::class, 'details']);
+    // Burnout
+    Route::get('/tasks/burnout', [BurnoutController::class, 'stats']);
+    Route::get('/tasks/burnout/details', [BurnoutController::class, 'details']);
 
-        // Profile
-        Route::get('/me', [ProfileController::class, 'show']);
-        Route::get('/me/personal-data', [ProfileController::class, 'personalData']);
-        Route::patch('/me/personal-data', [ProfileController::class, 'updatePersonalData']);
-        Route::put('/me/avatar', [ProfileController::class, 'updateAvatar']);
+    // Profile
+    Route::get('/me', [ProfileController::class, 'show']);
+    Route::get('/me/personal-data', [ProfileController::class, 'personalData']);
+    Route::patch('/me/personal-data', [ProfileController::class, 'updatePersonalData']);
+    Route::put('/me/avatar', [ProfileController::class, 'updateAvatar']);
 
-        // Assets
-        Route::get('/me/assets', AssetController::class);
+    // Assets
+    Route::get('/me/assets', AssetController::class);
 
-        // Payroll
-        Route::get('/me/payroll', [PayrollController::class, 'index']);
-        Route::get('/me/payroll/{id}', [PayrollController::class, 'show'])->whereUuid('id');
-        Route::get('/me/payroll/{id}/pdf', [PayrollController::class, 'pdf'])->whereUuid('id');
+    // Payroll
+    Route::get('/me/payroll', [PayrollController::class, 'index']);
+    Route::get('/me/payroll/{id}', [PayrollController::class, 'show'])->whereUuid('id');
+    Route::get('/me/payroll/{id}/pdf', [PayrollController::class, 'pdf'])->whereUuid('id');
     // Departments
     Route::get('/departments', [DepartmentController::class, 'index']);
     // Employees
@@ -110,10 +126,15 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Meetings
         Route::post('/meetings', [AdminMeetingController::class, 'store']);
+
+        // Expenses Review
+        Route::patch('/expenses/{id}/review', [ExpenseController::class, 'review'])->whereUuid('id');
+
+        // Leaves Review
+        Route::patch('/leaves/{id}/review', [LeaveController::class, 'review'])->whereUuid('id');
     });
 
 });
-
 
 // Tasks
 Route::prefix('tasks')
@@ -140,4 +161,3 @@ Route::prefix('tasks')
         Route::patch('/{task}/progress', [TaskWorkflowController::class, 'updateProgress']);
         Route::post('/{task}/complete', [TaskWorkflowController::class, 'complete']);
     });
-

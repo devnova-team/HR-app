@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             LevelSeeder::class,
             DepartmentSeeder::class,
             LocationSeeder::class,
+            LeaveCategorySeeder::class,
             RolesAndPermissionsSeeder::class,
             HrUserSeeder::class,
         ]);
